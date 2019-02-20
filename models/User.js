@@ -3,12 +3,12 @@ const Schema   = mongoose.Schema;
 
 const userSchema = new Schema({
   username: String,
-  password: String
+  password: String,
+  status: { type: String, enum: ['Pending Confirmation', 'Active'], default: 'Pending Confirmation' },
+  email: { type: String, unique: true, required: true },
+  confirmationCode: String
 }, {
-  timestamps: {
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
-  }
+  timestamps: true
 });
 
 const User = mongoose.model('User', userSchema);

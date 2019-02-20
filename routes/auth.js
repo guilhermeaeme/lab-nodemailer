@@ -24,10 +24,10 @@ router.get("/signup", (req, res, next) => {
 });
 
 router.post("/signup", (req, res, next) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  if (username === "" || password === "") {
-    res.render("auth/signup", { message: "Indicate username and password" });
+  const { username, password, email } = req.body;
+
+  if (username === "" || password === "" || email === "") {
+    res.render("auth/signup", { message: "Indicate username, password and email" });
     return;
   }
 
@@ -40,9 +40,17 @@ router.post("/signup", (req, res, next) => {
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(password, salt);
 
+    const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let confirmationCode = '';
+    for (let i = 0; i < 25; i++) {
+      confirmationCode += characters[Math.floor(Math.random() * characters.length )];
+    }
+
     const newUser = new User({
       username,
-      password: hashPass
+      password: hashPass,
+      email,
+      confirmationCode
     });
 
     newUser.save()
@@ -50,7 +58,7 @@ router.post("/signup", (req, res, next) => {
       res.redirect("/");
     })
     .catch(err => {
-      res.render("auth/signup", { message: "Something went wrong" });
+      res.render("auth/signup", { message: "Something went wrong. Details: " + err });
     })
   });
 });
