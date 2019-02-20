@@ -90,13 +90,17 @@ router.post("/signup", (req, res, next) => {
 });
 
 router.get("/confirm/:confirmationCode", (req, res) => {
-  let confirmationCode = req.params.confirmationCode;
+  let { confirmationCode } = req.params;
 
   User.findOneAndUpdate({confirmationCode}, {
     status: 'Active'
   }, { new: true })
   .then(user => {
-    res.render('auth/confirmation');
+    if(user !== null) {
+      res.render('auth/confirmation');
+    } else {
+      res.redirect('/');
+    }
   })
   .catch(err => {
     console.log(err);
